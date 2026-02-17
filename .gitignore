@@ -1,0 +1,60 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# --- Entornos Virtuales (NO SUBIR JAMÁS) ---
+venv/
+env/
+ENV/
+.env/
+.venv/
+
+# --- Variables de Entorno y Secretos (SEGURIDAD MÁXIMA) ---
+.env
+.env.local
+config/secrets.yaml
+
+# --- Datos (Data Lake Local) ---
+# No queremos subir GBs de datos a GitHub
+data/
+# Excepción: si quisieras mantener la estructura de carpetas vacías, 
+# se usan archivos .gitkeep, pero por ahora ignora todo data/
+
+# --- Logs y Bitácoras ---
+logs/
+*.log
+
+# --- Apache Spark / PySpark ---
+# Archivos temporales que genera Spark al correr
+metastore_db/
+derby.log
+spark-warehouse/
+checkpoint/
+
+# --- IDEs y Editores (Configuraciones de usuario) ---
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# --- Sistema Operativo ---
+.DS_Store
+Thumbs.db
