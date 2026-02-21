@@ -4,10 +4,9 @@ import logging
 from pathlib import Path
 from datetime import datetime
 from typing import List, Dict, Any
-import os
 
 # Logging configuration
-os.makedirs("logs", exist_ok=True)
+Path("logs").mkdir(exist_ok=True)
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
