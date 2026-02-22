@@ -2,9 +2,10 @@ import os
 import sys
 from pathlib import Path
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, explode, current_timestamp, to_timestamp
-from pyspark.sql.functions import udf
+from pyspark.sql.functions import col, explode, current_timestamp, to_timestamp, udf, lit
 from pyspark.sql.types import FloatType
+from pyspark.sql import DataFrame
+from functools import reduce
 from textblob import TextBlob
 from src.utils.nlp_setup import setup_nlp_environment
 from src.utils.logger import get_logger
@@ -34,7 +35,7 @@ class SilverProcessor:
         self.silver_news_path.mkdir(parents=True, exist_ok=True)
 
     def process_market_data(self):
-        """It reads the raw JSON from CoinGecko, flattens it, and types it."""
+        """Read the raw JSON from CoinGecko, dynamically iterates over the coins, flattens them, and types them.."""
         logger.info("Processing market data...")
 
         df_raw = self.spark.read.option("multiline", "true").json(self.bronze_market_path.as_posix())
@@ -43,22 +44,38 @@ class SilverProcessor:
             logger.warning("No data was found in the Bronze Layer.")
             return
         
-        # Data wrangling
-        if "bitcoin" in df_raw.columns:
-            df_clean = df_raw.select(
-                col("bitcoin.usd").alias("price_usd"),
-                col("bitcoin.usd_market_cap").alias("market_cap"),
-                col("bitcoin.usd_24h_vol").alias("volume_24h"),
-                col("bitcoin.last_updated_at").alias("last_updated_ts")
-            )
+        # Create an empty list to store the sub-DataFrames
+        coin_dfs = []
+
+        # Dynamically iterate over all the columns (coins) that Spark found in the JSON
+        for coin_name in df_raw.columns:
+            # We ignore Spark's internal metadata columns
+            if coin_name.startswith("_"): 
+                continue
+                
+            logger.info(f"Extracting dimensions for coin: {coin_name}")
             
-            # Casting: Convert the UNIX timestamp (seconds) to a standard UTC Date/Time format
+            # Extract the branch and add the static column coin_id
+            df_coin = df_raw.select(
+                lit(coin_name).alias("coin_id"), # Inject the name into all rows
+                col(f"{coin_name}.usd").alias("price_usd"),
+                col(f"{coin_name}.usd_market_cap").alias("market_cap"),
+                col(f"{coin_name}.usd_24h_vol").alias("volume_24h"),
+                col(f"{coin_name}.last_updated_at").alias("last_updated_ts")
+            )
+            coin_dfs.append(df_coin)
+
+        # Combine all sub-DataFrames into a single array
+        if coin_dfs:
+            df_clean = reduce(DataFrame.unionByName, coin_dfs)
+            
+            # Convert the UNIX timestamp (seconds) to a standard UTC Date/Time format
             df_clean = df_clean.withColumn(
                 "timestamp", 
                 to_timestamp(col("last_updated_ts"))
             ).drop("last_updated_ts")
             
-            # AAdd metadata about when it was processed in Silver
+            # Add metadata about when it was processed in Silver
             df_clean = df_clean.withColumn("processed_at", current_timestamp())
 
             # Show the resulting mathematical scheme and a couple of rows
@@ -70,6 +87,8 @@ class SilverProcessor:
             self.silver_market_path.mkdir(parents=True, exist_ok=True)
             df_clean.write.mode("append").parquet(self.silver_market_path.as_posix())
             logger.info("Market processing completed.")
+        else:
+            logger.warning("No valid cryptocurrency keys found in the JSON.")
 
     def process_news_data(self):
         """Read the raw headlines, clean up the text, and quantify the sentiment.."""

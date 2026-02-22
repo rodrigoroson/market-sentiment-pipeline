@@ -81,8 +81,8 @@ class GoldProcessor:
         df_gold.write.mode("overwrite").parquet(self.gold_output_path.as_posix())
         
         # Also save a CSV file so you can easily open it in Excel.
-        csv_path = self.gold_output_path + "_csv"
-        df_gold.write.mode("overwrite").option("header", "true").csv(csv_path)
+        csv_path = self.gold_output_path.with_name(f"{self.gold_output_path.name}_csv")
+        df_gold.write.mode("overwrite").option("header", "true").csv(csv_path.as_posix())
         
         logger.info("Analytical pipeline successfully completed.")
 
