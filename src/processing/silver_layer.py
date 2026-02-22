@@ -29,6 +29,10 @@ class SilverProcessor:
         self.bronze_news_path = Path("data/bronze/news/*/*.json")
         self.silver_news_path = Path("data/silver/news")
 
+        # Check if silver layer directories exist
+        self.silver_market_path.mkdir(parents=True, exist_ok=True)
+        self.silver_news_path.mkdir(parents=True, exist_ok=True)
+
     def process_market_data(self):
         """It reads the raw JSON from CoinGecko, flattens it, and types it."""
         logger.info("Processing market data...")
