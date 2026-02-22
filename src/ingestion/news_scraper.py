@@ -5,18 +5,9 @@ import json
 from pathlib import Path
 from datetime import datetime
 from typing import List, Dict
+from src.utils.logger import logger
 
-# Logging configuration
-Path("logs").mkdir(exist_ok=True)
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler("logs/scraper.log"),
-        logging.StreamHandler()
-    ]
-)
-logger = logging.getLogger(__name__)
+logger = logger(__name__)
 
 class YahooFinanceScraper:
     """
