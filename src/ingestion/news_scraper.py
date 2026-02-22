@@ -5,9 +5,9 @@ import json
 from pathlib import Path
 from datetime import datetime
 from typing import List, Dict
-from src.utils.logger import logger
+from src.utils.logger import get_logger
 
-logger = logger(__name__)
+logger = get_logger(__name__)
 
 class YahooFinanceScraper:
     """
