@@ -1,6 +1,5 @@
 import requests
 from bs4 import BeautifulSoup
-import logging
 import json
 from pathlib import Path
 from datetime import datetime
