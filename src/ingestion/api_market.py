@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import List, Dict, Any
 from src.utils.logger import get_logger
 
-logger = get_logger(__name__)
+logger = get_logger(Path(__file__).stem)
 
 class CoinGeckoIngestor:
     """

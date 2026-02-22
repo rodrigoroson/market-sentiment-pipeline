@@ -3,7 +3,7 @@ from pathlib import Path
 from pyspark.sql import SparkSession
 from src.utils.logger import get_logger
 
-logger = get_logger(__name__)
+logger = get_logger(Path(__file__).stem)
 
 class GoldProcessor:
     def __init__(self):

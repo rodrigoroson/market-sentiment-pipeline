@@ -13,7 +13,7 @@ from src.utils.logger import get_logger
 os.environ['PYSPARK_PYTHON'] = sys.executable
 os.environ['PYSPARK_DRIVER_PYTHON'] = sys.executable
 
-logger = get_logger(__name__)
+logger = get_logger(Path(__file__).stem)
 
 class SilverProcessor:
     def __init__(self):
