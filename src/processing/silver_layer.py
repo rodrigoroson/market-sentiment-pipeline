@@ -24,10 +24,12 @@ class SilverProcessor:
             .master("local[*]") \
             .getOrCreate()
             
-        # Entry (Bronze) and exit (Silver) routes
-        self.bronze_market_path = Path("data/bronze/market/*/*.json")
+        # Entry (Bronze)
+        self.bronze_market_path = "data/bronze/market/*/*.json"
+        self.bronze_news_path = "data/bronze/news/*/*.json"
+
+        # Exit (Silver)
         self.silver_market_path = Path("data/silver/market")
-        self.bronze_news_path = Path("data/bronze/news/*/*.json")
         self.silver_news_path = Path("data/silver/news")
 
         # Check if silver layer directories exist
@@ -38,7 +40,7 @@ class SilverProcessor:
         """Read the raw JSON from CoinGecko, dynamically iterates over the coins, flattens them, and types them.."""
         logger.info("Processing market data...")
 
-        df_raw = self.spark.read.option("multiline", "true").json(self.bronze_market_path.as_posix())
+        df_raw = self.spark.read.option("multiline", "true").json(self.bronze_market_path)
 
         if df_raw.rdd.isEmpty():
             logger.warning("No data was found in the Bronze Layer.")
@@ -98,7 +100,7 @@ class SilverProcessor:
         logger.info("Processing news data...")
         
         # Read news JSON
-        df_raw = self.spark.read.option("multiline", "true").json(self.bronze_news_path.as_posix())
+        df_raw = self.spark.read.option("multiline", "true").json(self.bronze_news_path)
         
         if df_raw.rdd.isEmpty():
             logger.warning("No news was found in the Bronze Layer.")
@@ -135,7 +137,7 @@ class SilverProcessor:
         df_clean.show(truncate=False)
 
         # Drop duplicates
-        df_clean = df_clean.dropDuplicates(["coin_id", "timestamp"])
+        df_clean = df_clean.dropDuplicates(["title", "timestamp"])
 
         # Load
         logger.info("Writing structured news in Parquet format...")
