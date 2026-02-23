@@ -82,10 +82,13 @@ class SilverProcessor:
             df_clean.printSchema()
             df_clean.show(truncate=False)
 
+            # Drop duplicates
+            df_clean = df_clean.dropDuplicates(["coin_id", "timestamp"])
+
             # Load
             logger.info("Writing clean data in Parquet format...")
             self.silver_market_path.mkdir(parents=True, exist_ok=True)
-            df_clean.write.mode("append").parquet(self.silver_market_path.as_posix())
+            df_clean.write.mode("overwrite").parquet(self.silver_market_path.as_posix())
             logger.info("Market processing completed.")
         else:
             logger.warning("No valid cryptocurrency keys found in the JSON.")
@@ -131,9 +134,12 @@ class SilverProcessor:
         df_clean.printSchema()
         df_clean.show(truncate=False)
 
+        # Drop duplicates
+        df_clean = df_clean.dropDuplicates(["coin_id", "timestamp"])
+
         # Load
         logger.info("Writing structured news in Parquet format...")
-        df_clean.write.mode("append").parquet(self.silver_news_path.as_posix())
+        df_clean.write.mode("overwrite").parquet(self.silver_news_path.as_posix())
         logger.info("News processing completed.")
     
     def stop(self):
