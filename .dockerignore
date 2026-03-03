@@ -1,0 +1,9 @@
+# .dockerignore
+data/
+logs/
+__pycache__/
+*.pyc
+.git/
+.vscode/
+.venv/
+venv/
