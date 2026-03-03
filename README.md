@@ -9,22 +9,22 @@ An End-to-End Data Engineering pipeline designed to extract, process, and analyz
 
 The project is 100% containerized to guarantee reproducibility and an agnostic deployment environment.
 
-## 🏛️ Data Architecture (Medallion)
+## Data Architecture (Medallion)
 
 The system implements the industry-standard Medallion Architecture, ensuring data traceability, quality, and strict idempotency:
 
-* **🥉 Bronze Layer (Raw Data):** Immutable ingestion.
+* **Bronze Layer (Raw Data):** Immutable ingestion.
   * Time-series price extraction via REST API (CoinGecko).
   * Dynamic Web Scraping of financial headlines (Yahoo Finance), bypassing bot-protection through network header spoofing.
-* **🥈 Silver Layer (Distributed Processing & AI):** The transformation engine.
+* **Silver Layer (Distributed Processing & AI):** The transformation engine.
   * Cleansing, flattening of complex JSONs, and strict type casting using **Apache Spark (PySpark)**.
   * Implementation of Natural Language Processing (TextBlob) distributed via Spark UDFs (User Defined Functions) to calculate sentiment polarity.
   * Strict deduplication logic and format transition to columnar **Parquet**.
-* **🥇 Gold Layer (Business Intelligence):** Analytical modeling.
+* **Gold Layer (Business Intelligence):** Analytical modeling.
   * Temporal aggregation and dimensional joins (Market vs. News) using in-memory **SQL**.
   * Safe null-handling (`COALESCE`) to protect the integrity of downstream visualization tools.
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 * **Big Data Processing:** PySpark, SQL.
 * **Software Engineering:** Python 3.10, Defensive Programming, Log Rotation (`RotatingFileHandler`).
@@ -32,7 +32,7 @@ The system implements the industry-standard Medallion Architecture, ensuring dat
 * **Infrastructure & DevOps:** Docker, Docker Compose.
 * **Visualization:** Pandas, Matplotlib (Dynamic dashboard generation iterating over discovered dimensions).
 
-## 🐳 Quick Start (Reproducibility)
+## Quick Start (Reproducibility)
 
 The project is configured with `docker-compose` to spin up the entire environment (including the required Java Virtual Machine for Spark) without local dependency conflicts.
 
@@ -59,7 +59,7 @@ Once the pipeline finishes, run this command to render the analytical charts:
 docker compose run pipeline python -m src.visualization.plot_metrics
 ```
 
-## 📊 Visual Results
+## Visual Results
 
 The system automatically generates analytical dashboards for every asset discovered in the database, crossing the historical price with the market sentiment index.
 
